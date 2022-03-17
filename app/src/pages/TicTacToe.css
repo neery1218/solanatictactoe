@@ -1,0 +1,19 @@
+p {
+  width: 200px;
+  height: 200px;
+  
+  background-color: white;
+  margin: 10px;
+  color: black;
+}
+
+div {
+  display: flex;
+  flex-direction: column;
+}
+
+.row {
+  flex-direction: row;
+  justify-content: center;
+}
+

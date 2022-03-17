@@ -2,7 +2,7 @@ use anchor_lang::prelude::*;
 use num_derive::*;
 use num_traits::*;
 
-declare_id!("Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS");
+declare_id!("BJiKgwZCSuoN5YHaxPuzYDVabejWUyEh4dAvrTVrpsFd");
 
 #[error_code]
 pub enum TicTacToeError {
@@ -26,7 +26,7 @@ pub mod tictactoe {
     }
 
     pub fn play(ctx: Context<Play>, r: u8, c: u8) -> Result<()> {
-        msg!("Play!");
+        msg!("Play! ({},{})", r, c);
         let game = &mut ctx.accounts.state;
         if matches!(game.status, Status::XWins | Status::OWins) {
             return err!(TicTacToeError::GameAlreadyOver);

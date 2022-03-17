@@ -5,6 +5,7 @@ import { createTheme, CssBaseline, ThemeProvider } from '@material-ui/core';
 import { SnackbarProvider } from 'notistack';
 import Wallet from './components/Wallet';
 import EscrowPage from './pages/EscrowPage';
+import {TicTacToe} from './pages/TicTacToe';
 
 const theme = createTheme({
   palette: {
@@ -43,7 +44,7 @@ const App: FC = () => {
       <CssBaseline />
       <SnackbarProvider>
         <Wallet>
-          <EscrowPage />
+          <TicTacToe/>
         </Wallet>
       </SnackbarProvider>
     </ThemeProvider>
