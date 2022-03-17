@@ -3,8 +3,8 @@ import { Program } from "@project-serum/anchor";
 import { assert, expect } from "chai";
 import { Tictactoe } from "../target/types/tictactoe";
 const { SystemProgram } = anchor.web3;
-import { GameState } from "../ts/accounts/GameState";
-import { Sign, SignKind } from "../ts/types/index";
+import { GameState } from "./accounts/GameState";
+import { Sign, SignKind } from "./types/index";
 import { Connection } from "@solana/web3.js";
 
 describe("tictactoe", () => {
