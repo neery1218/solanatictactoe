@@ -14,3 +14,5 @@ build and deploy the solana program to localnet
 ```
 anchor build && anchor deploy
 ```
+
+![alt text](https://media.giphy.com/media/06AFxjfepx2tHOTIMj/giphy.gif)
