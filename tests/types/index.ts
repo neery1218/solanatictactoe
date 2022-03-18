@@ -1,5 +1,5 @@
 import * as Status from "./Status"
-import * as Sign from "./Sign"
+import * as Mark from "./Mark"
 
 export { Status }
 
@@ -14,7 +14,7 @@ export type StatusJSON =
   | Status.XWinsJSON
   | Status.OWinsJSON
 
-export { Sign }
+export { Mark }
 
-export type SignKind = Sign.X | Sign.O
-export type SignJSON = Sign.XJSON | Sign.OJSON
+export type MarkKind = Mark.Empty | Mark.X | Mark.O
+export type MarkJSON = Mark.EmptyJSON | Mark.XJSON | Mark.OJSON

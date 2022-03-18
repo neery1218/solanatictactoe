@@ -5,6 +5,7 @@ export type CustomError =
   | TileAlreadySet
   | GameAlreadyOver
   | NotPlayersTurn
+  | BadStatus
 
 export class TileOutOfBounds extends Error {
   readonly code = 6000
@@ -46,6 +47,16 @@ export class NotPlayersTurn extends Error {
   }
 }
 
+export class BadStatus extends Error {
+  readonly code = 6004
+  readonly name = "BadStatus"
+  readonly msg = "undefined"
+
+  constructor() {
+    super("6004: undefined")
+  }
+}
+
 export function fromCode(code: number): CustomError | null {
   switch (code) {
     case 6000:
@@ -56,6 +67,8 @@ export function fromCode(code: number): CustomError | null {
       return new GameAlreadyOver()
     case 6003:
       return new NotPlayersTurn()
+    case 6004:
+      return new BadStatus()
   }
 
   return null

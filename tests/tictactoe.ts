@@ -63,7 +63,7 @@ describe("tictactoe", () => {
 
     const g = await GameState.fetch(provider.connection, gs.publicKey);
     console.log(g);
-    expect(g.status.kind).to.equal("XWins");
+    expect(g.status).to.equal(2);
 
     try {
       await play(0,0, gs);

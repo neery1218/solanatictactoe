@@ -1,8 +1,9 @@
 p {
+  background-color: white;
   width: 200px;
   height: 200px;
-  
-  background-color: white;
+  font-size: 10em;
+  text-align: center;
   margin: 10px;
   color: black;
 }

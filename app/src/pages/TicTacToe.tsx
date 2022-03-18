@@ -6,6 +6,7 @@ import { Tictactoe as TicTacToeIdl } from "../utils/idls/tictactoe";
 import TicTacToeJson from "../utils/idls/tictactoe.json";
 import "./TicTacToe.css";
 import { useSnackbar } from "notistack";
+import { Box, Button, Typography } from "@material-ui/core";
 
 import { PublicKey, SystemProgram, Transaction } from "@solana/web3.js";
 
@@ -73,20 +74,26 @@ export function TicTacToe() {
 
   if (!created) {
     return (
-      <div>
-        <button
-          onClick={async () => {
-            try {
-              await create();
-              setCreated(true);
-            } catch (e) {
-              enqueueSnackbar(`${e}`, { variant: "error" });
-            }
-          }}
-        >
-          Create Game
-        </button>
-      </div>
+      <Box sx={{'justifyContent': 'center', 'height': '100%', 'alignItems': 'center'}}>
+        <Box sx={{'width': 'fit-content'}}>
+          <Button
+            size="medium"
+            variant="contained"
+            onClick={async () => {
+              try {
+                await create();
+                setCreated(true);
+              } catch (e) {
+                enqueueSnackbar(`${e}`, { variant: "error" });
+              }
+            }}
+          >
+            <Typography variant="h1">
+              Create Game
+            </Typography>
+          </Button>
+        </Box>
+      </Box>
     );
   } else {
     var board = [];
@@ -131,7 +138,7 @@ function Square(props: SquareProps) {
         }
       }}
     >
-      {props.val == null ? " " : "x" in props.val ? "x" : "o"}
+      {props.val == 0 ? " " : props.val == 1 ? "x" : "o"}
     </p>
   );
 }

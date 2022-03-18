@@ -5,30 +5,30 @@ import * as types from "../types"
 import { PROGRAM_ID } from "../programId"
 
 export interface GameStateFields {
-  turn: BN
-  grid: Array<Array<types.SignKind | null>>
-  status: types.StatusKind
+  turn: number
+  grid: Array<Array<number>>
+  status: number
 }
 
 export interface GameStateJSON {
-  turn: string
-  grid: Array<Array<types.SignJSON | null>>
-  status: types.StatusJSON
+  turn: number
+  grid: Array<Array<number>>
+  status: number
 }
 
 export class GameState {
-  readonly turn: BN
-  readonly grid: Array<Array<types.SignKind | null>>
-  readonly status: types.StatusKind
+  readonly turn: number
+  readonly grid: Array<Array<number>>
+  readonly status: number
 
   static readonly discriminator = Buffer.from([
     144, 94, 208, 172, 248, 99, 134, 120,
   ])
 
   static readonly layout = borsh.struct([
-    borsh.u64("turn"),
-    borsh.array(borsh.array(borsh.option(types.Sign.layout()), 3), 3, "grid"),
-    types.Status.layout("status"),
+    borsh.u8("turn"),
+    borsh.array(borsh.array(borsh.u8(), 3), 3, "grid"),
+    borsh.u8("status"),
   ])
 
   constructor(fields: GameStateFields) {
@@ -62,30 +62,24 @@ export class GameState {
 
     return new GameState({
       turn: dec.turn,
-      grid: dec.grid.map((item) =>
-        item.map((item) => (item && types.Sign.fromDecoded(item)) || null)
-      ),
-      status: types.Status.fromDecoded(dec.status),
+      grid: dec.grid,
+      status: dec.status,
     })
   }
 
   toJSON(): GameStateJSON {
     return {
-      turn: this.turn.toString(),
-      grid: this.grid.map((item) =>
-        item.map((item) => (item && item.toJSON()) || null)
-      ),
-      status: this.status.toJSON(),
+      turn: this.turn,
+      grid: this.grid,
+      status: this.status,
     }
   }
 
   static fromJSON(obj: GameStateJSON): GameState {
     return new GameState({
-      turn: new BN(obj.turn),
-      grid: obj.grid.map((item) =>
-        item.map((item) => (item && types.Sign.fromJSON(obj.item)) || null)
-      ),
-      status: types.Status.fromJSON(obj.status),
+      turn: obj.turn,
+      grid: obj.grid,
+      status: obj.status,
     })
   }
 }

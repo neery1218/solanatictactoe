@@ -10,6 +10,7 @@ pub enum TicTacToeError {
     TileAlreadySet,
     GameAlreadyOver,
     NotPlayersTurn,
+    BadStatus,
 }
 
 #[program]
@@ -19,18 +20,27 @@ pub mod tictactoe {
     pub fn create(ctx: Context<CreateGame>) -> Result<()> {
         let game = &mut ctx.accounts.state;
         game.turn = 0;
-        game.grid = [[None; 3]; 3];
-        game.status = Status::Created;
+        game.grid = [[Mark::Empty as u8; 3]; 3];
+        game.status = Status::Created as u8;
 
         Ok(())
     }
 
     pub fn play(ctx: Context<Play>, r: u8, c: u8) -> Result<()> {
         msg!("Play! ({},{})", r, c);
+        msg!("size: {}", std::mem::size_of::<GameState>());
         let game = &mut ctx.accounts.state;
-        if matches!(game.status, Status::XWins | Status::OWins) {
+        msg!("grid before: {:?}", game.grid);
+
+        require!(
+            Status::from_u8(game.status) != None,
+            TicTacToeError::BadStatus
+        );
+
+        if game.status == Status::XWins as u8 || game.status == Status::OWins as u8 {
             return err!(TicTacToeError::GameAlreadyOver);
         }
+        game.status = Status::InProgress as u8;
 
         match game
             .grid
@@ -38,27 +48,33 @@ pub mod tictactoe {
             .and_then(|row| row.get(c as usize))
         {
             None => err!(TicTacToeError::TileOutOfBounds),
-            Some(&Some(_)) => err!(TicTacToeError::TileAlreadySet),
-            Some(None) => {
-                game.grid[r as usize][c as usize] = match game.turn % 2 {
-                    0 => Some(Sign::X),
-                    1 => Some(Sign::O),
-                    _ => unreachable!(),
-                };
-                game.status = check_win(&game.grid, (r as usize, c as usize));
-                game.turn += 1;
-                Ok(())
-            }
+            Some(&x) => match Mark::from_u8(x) {
+                None => err!(TicTacToeError::BadStatus),
+                Some(Mark::X) => err!(TicTacToeError::TileAlreadySet),
+                Some(Mark::O) => err!(TicTacToeError::TileAlreadySet),
+                Some(Mark::Empty) => {
+                    game.grid[r as usize][c as usize] = match game.turn % 2 {
+                        0 => Mark::X as u8,
+                        1 => Mark::O as u8,
+                        _ => unreachable!(),
+                    };
+                    game.status = check_win(&game.grid, (r as usize, c as usize)) as u8;
+                    msg!("Status: {}", game.status);
+                    game.turn += 1;
+                    Ok(())
+                }
+            },
         }
     }
 }
 
-fn check_win(grid: &[[Option<Sign>; 3]; 3], (r, c): (usize, usize)) -> Status {
+fn check_win(grid: &[[u8; 3]; 3], (r, c): (usize, usize)) -> Status {
     let sign = grid[r][c];
 
-    let win_status = match sign {
-        Some(Sign::X) => Status::XWins,
-        Some(Sign::O) => Status::OWins,
+    let win_status = match Mark::from_u8(sign) {
+        Some(Mark::X) => Status::XWins,
+        Some(Mark::O) => Status::OWins,
+        Some(Mark::Empty) => Status::InProgress,
         None => Status::InProgress,
     };
 
@@ -77,7 +93,7 @@ fn check_win(grid: &[[Option<Sign>; 3]; 3], (r, c): (usize, usize)) -> Status {
         return win_status;
     }
 
-    if (0..2).all(|i| grid[2 - r][i] == sign) {
+    if (0..3).all(|i| grid[2 - r][i] == sign) {
         msg!("winner 4!");
         return win_status;
     }
@@ -102,25 +118,28 @@ pub struct Play<'info> {
     pub state: Account<'info, GameState>,
 }
 
-#[derive(AnchorSerialize, AnchorDeserialize, Clone, Copy, PartialEq, Eq)]
+#[derive(
+    AnchorSerialize, AnchorDeserialize, FromPrimitive, ToPrimitive, Clone, Copy, PartialEq, Eq,
+)]
 pub enum Status {
-    Created,
-    InProgress,
-    XWins,
-    OWins,
+    Created = 0,
+    InProgress = 1,
+    XWins = 2,
+    OWins = 3,
 }
 
 #[account]
 pub struct GameState {
-    pub turn: u64,
-    pub grid: [[Option<Sign>; 3]; 3],
-    pub status: Status,
+    pub turn: u8,
+    pub grid: [[u8; 3]; 3],
+    pub status: u8,
 }
 
 #[derive(
     AnchorSerialize, AnchorDeserialize, FromPrimitive, ToPrimitive, Copy, Clone, PartialEq, Eq,
 )]
-pub enum Sign {
-    X = 0,
-    O = 1,
+pub enum Mark {
+    Empty = 0,
+    X = 1,
+    O = 2,
 }

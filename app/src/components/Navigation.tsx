@@ -8,7 +8,7 @@ const Navigation: FC = () => {
   const { wallet } = useWallet();
 
   return (
-    <Toolbar style={{ display: 'flex', flexDirection: 'row'}}>
+    <Toolbar style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end'}}>
         <WalletMultiButton />
         {wallet && <WalletDisconnectButton startIcon={<LinkOff />} style={{ marginLeft: 8 }} />}
     </Toolbar>

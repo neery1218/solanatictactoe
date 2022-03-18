@@ -1,1 +1,1 @@
-export type { GameState, GameStateFields, GameStateJSON } from "./GameState"
+export { GameState, GameStateFields, GameStateJSON } from "./GameState"
