@@ -1,11 +1,16 @@
-# anchor-scaffold
+# solana-tictactoe
 
-An escrow program is a great example to get started with Solana, it allows discovering the main principles and to interact with the token program.
+I built this at the nyc solana hacker house. I initially planned to build a prediction market, but I got humbled real quick and spend most of the week building this 😂
 
-While this is an anchor E2E example, this doesn't cover at all the underlying principles, i recommend to get started with [The "vanilla" Solana Paulx escrow tutorial](https://paulx.dev/blog/2021/01/14/programming-on-solana-an-introduction/)
+The scaffolding was cloned from https://github.com/Arrowana/anchor-scaffold/tree/master/programs/escrow 
 
-## Escrow program
+# Steps to run
+start a solana test validator 
+```
+solana-test-validator
+```
 
-The program is similar but not exactly https://github.com/project-serum/anchor/tree/master/tests/escrow
-
-Some modification have been made to make it more anchor-y and easier to handle in the UI.
+build and deploy the solana program to localnet
+```
+anchor build && anchor deploy
+```
