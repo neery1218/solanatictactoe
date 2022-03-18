@@ -10,6 +10,10 @@ start a solana test validator
 solana-test-validator
 ```
 
+airdrop yourself some solana
+```
+solana airdrop 2 {address of phantom wallet}
+```
 build and deploy the solana program to localnet
 ```
 anchor build && anchor deploy
