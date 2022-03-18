@@ -20,8 +20,6 @@ class StubWallet {
   }
 }
 const STUB_WALLET = new StubWallet();
-const gs = anchor.web3.Keypair.generate();
-// console.log(`tictactoe account publickey: ${gs.publicKey}`);
 
 const ESCROW_PROGRAM_ID = new PublicKey(
   "BJiKgwZCSuoN5YHaxPuzYDVabejWUyEh4dAvrTVrpsFd"
@@ -34,33 +32,42 @@ export function TicTacToe() {
   const wallet = useAnchorWallet();
   const provider = new Provider(connection, wallet || STUB_WALLET, {});
   const [created, setCreated] = useState<boolean>(false);
-  const [gameState, setGameState] = useState<Object>();
+  const [gameState, setGameState] = useState<[anchor.web3.Keypair, Object]>([
+    anchor.web3.Keypair.generate(),
+    {},
+  ]);
   const { enqueueSnackbar } = useSnackbar();
 
   async function create() {
+    const kp = anchor.web3.Keypair.generate();
     await program.rpc.create({
       accounts: {
-        state: gs.publicKey,
+        state: kp.publicKey,
         user: provider.wallet.publicKey,
         systemProgram: SystemProgram.programId,
       },
-      signers: [gs],
+      signers: [kp],
     });
 
-    const g = await program.account.gameState.fetch(gs.publicKey);
-    setGameState(g);
+    const g = await program.account.gameState.fetch(kp.publicKey);
+    setGameState([kp, g]);
   }
 
   async function play(r: number, c: number) {
     await program.rpc.play(r, c, {
       accounts: {
-        state: gs.publicKey,
+        state: gameState[0].publicKey,
       },
       signers: [],
     });
 
-    const g = await program.account.gameState.fetch(gs.publicKey);
-    setGameState(g);
+    const g = await program.account.gameState.fetch(gameState[0].publicKey);
+    if (g.status == 2) {
+      enqueueSnackbar("X Wins!");
+    } else if (g.status == 3) {
+      enqueueSnackbar("O Wins!");
+    }
+    setGameState([gameState[0], g]);
   }
 
   const program = useMemo(() => {
@@ -74,8 +81,10 @@ export function TicTacToe() {
 
   if (!created) {
     return (
-      <Box sx={{'justifyContent': 'center', 'height': '100%', 'alignItems': 'center'}}>
-        <Box sx={{'width': 'fit-content'}}>
+      <Box
+        sx={{ justifyContent: "center", height: "100%", alignItems: "center" }}
+      >
+        <Box sx={{ width: "fit-content" }}>
           <Button
             size="medium"
             variant="contained"
@@ -88,9 +97,7 @@ export function TicTacToe() {
               }
             }}
           >
-            <Typography variant="h1">
-              Create Game
-            </Typography>
+            <Typography variant="h1">Create Game</Typography>
           </Button>
         </Box>
       </Box>
@@ -101,7 +108,7 @@ export function TicTacToe() {
       var row = [];
       for (var j = 0; j < 3; j++) {
         // @ts-ignore
-        const v = gameState.grid[i][j];
+        const v = gameState[1].grid[i][j];
         row.push(<Square key={3 * i + j} i={i} j={j} val={v} play={play} />);
       }
       board.push(
@@ -113,6 +120,22 @@ export function TicTacToe() {
     return (
       <div className="App">
         <div className="Board">{board}</div>
+        <Box sx={{ width: "fit-content", alignItems: "center" }}>
+          <Button
+            size="medium"
+            variant="contained"
+            onClick={async () => {
+              try {
+                await create();
+                setCreated(true);
+              } catch (e) {
+                enqueueSnackbar(`${e}`, { variant: "error" });
+              }
+            }}
+          >
+            <Typography variant="h2">Reset Game</Typography>
+          </Button>
+        </Box>
       </div>
     );
   }
