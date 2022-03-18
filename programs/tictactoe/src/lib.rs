@@ -93,7 +93,7 @@ fn check_win(grid: &[[u8; 3]; 3], (r, c): (usize, usize)) -> Status {
         return win_status;
     }
 
-    if (0..3).all(|i| grid[2 - r][i] == sign) {
+    if (0..3).all(|i| grid[2 - i][i] == sign) {
         msg!("winner 4!");
         return win_status;
     }
